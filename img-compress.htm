@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free online image compressor with adjustable quality settings. Reduce image file size without losing quality. Supports JPEG, PNG, and WEBP formats.">
+    <meta name="keywords" content="image compressor, optimize images, reduce image size, web optimization, free image tools">
+    <title>Image Compressor Pro | Online Image Optimization Tool</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Arial',sans-serif}
+        body{background:#f0f2f5;line-height:1.6;padding:20px}
+        .container{max-width:1200px;margin:0 auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 15px rgba(0,0,0,0.1)}
+        .header{text-align:center;margin-bottom:30px;padding:20px 0}
+        .ad-banner{margin:20px 0;text-align:center;background:#f8f9fa;padding:10px;border-radius:5px}
+        .compression-interface{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:20px}
+        .upload-section{border:2px dashed #ccc;padding:20px;text-align:center;border-radius:8px;cursor:pointer;min-height:300px}
+        #fileInput{display:none}
+        .preview-container{margin-top:20px;position:relative}
+        .preview-image{max-width:100%;height:auto;border-radius:5px}
+        .controls{display:flex;flex-direction:column;gap:15px}
+        .quality-slider{width:100%;margin:15px 0}
+        .download-btn{background:#4CAF50;color:#fff;padding:12px 24px;border:none;border-radius:5px;cursor:pointer;font-size:16px;transition:background 0.3s}
+        .download-btn:hover{background:#45a049}
+        #fileInfo{padding:15px;background:#f8f9fa;border-radius:5px}
+        @media (max-width:768px){.compression-interface{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="ad-banner">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+        </div>
+
+        <header class="header">
+            <h1>Image Compressor Pro</h1>
+            <p>Optimize images for web with adjustable compression quality</p>
+        </header>
+
+        <main>
+            <div class="compression-interface">
+                <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" accept="image/*">
+                    <p>Click to upload image (JPEG, PNG, WEBP)</p>
+                    <div class="preview-container">
+                        <canvas id="imagePreview" class="preview-image"></canvas>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <label>Compression Quality: <span id="qualityValue">80</span>%</label>
+                    <input type="range" id="qualityRange" class="quality-slider" min="1" max="100" value="80">
+                    <button onclick="compressImage()" class="download-btn">Compress & Download</button>
+                    <div id="fileInfo"></div>
+                </div>
+            </div>
+        </main>
+
+        <div class="ad-banner" style="margin-top:30px">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle=window.adsbygoogle||[]).push({})</script>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const qualityRange = document.getElementById('qualityRange');
+        const qualityValue = document.getElementById('qualityValue');
+        const canvas = document.getElementById('imagePreview');
+        const ctx = canvas.getContext('2d');
+        let originalFileSize = 0;
+
+        qualityRange.addEventListener('input', (e) => qualityValue.textContent = e.target.value);
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file.type.startsWith('image/')) return alert('Please select an image file');
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    originalFileSize = file.size;
+                    showFileInfo(file, img);
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function showFileInfo(file, img) {
+            document.getElementById('fileInfo').innerHTML = `
+                <p>File Name: ${file.name}</p>
+                <p>Original Size: ${formatSize(file.size)}</p>
+                <p>Dimensions: ${img.width}x${img.height}</p>
+            `;
+        }
+
+        function compressImage() {
+            if (!originalFileSize) return alert('Please upload an image first');
+            
+            const quality = qualityRange.value / 100;
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.download = `compressed-${Date.now()}.jpg`;
+                a.href = url;
+                a.click();
+                
+                document.getElementById('fileInfo').innerHTML += `
+                    <p>Compressed Size: ${formatSize(blob.size)}</p>
+                    <p>Size Reduction: ${((1 - blob.size/originalFileSize) * 100).toFixed(1)}%</p>
+                `;
+                URL.revokeObjectURL(url);
+            }, 'image/jpeg', quality);
+        }
+
+        function formatSize(bytes) {
+            const units = ['B', 'KB', 'MB'];
+            let size = bytes;
+            for (let i = 0; i < units.length; i++) {
+                if (size < 1024) return `${size.toFixed(2)} ${units[i]}`;
+                size /= 1024;
+            }
+            return `${size.toFixed(2)} GB`;
+        }
+    </script>
+</body>
+</html>
